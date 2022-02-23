@@ -1,3 +1,7 @@
+if [ $(id -u) -ne 0 ]; then
+  printf "Script must be run as root.\n"
+  exit 1
+fi
 apt install parted
 ROOT_PART="$(findmnt / -o source -n)"
 ROOT_DEV="/dev/$(lsblk -no pkname "$ROOT_PART")"
