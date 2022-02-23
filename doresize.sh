@@ -6,14 +6,15 @@ fi
 ROOT_PART="$(findmnt / -o source -n)"
 ROOT_DEV="/dev/$(lsblk -no pkname "$ROOT_PART")"
 PART_NUM="$(echo "$ROOT_PART" | grep -o "[[:digit:]]*$")"
+
+apt install parted
+
 LAST_PART_NUM=$(parted "$ROOT_DEV" -ms unit s p | tail -n 1 | cut -f 1 -d:)
 
 if [ $LAST_PART_NUM -ne $PART_NUM ]; then
   printf "$ROOT_PART is not the last partition. Please disable swap.\n"
   exit 1
 fi
-
-apt install parted
 
 PART_START=$(parted "$ROOT_DEV" -ms unit s p | grep "^${PART_NUM}" | cut -f 2 -d: | sed 's/[^0-9]//g')
 fdisk "$ROOT_DEV" <<EOF
